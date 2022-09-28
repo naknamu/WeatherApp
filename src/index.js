@@ -29,8 +29,7 @@ let url =
   "&appid=" +
   api_key.weather;
 
-let url_icon =
-  "https://openweathermap.org/img/wn/" + weather.weather_icon + "@2x.png";
+let url_icon;
 
 /*Display fetched data in the console*/
 const displayWeatherData = () => {
@@ -53,6 +52,44 @@ const displayWeatherData = () => {
   console.log("Pressure: " + weather.pressure + "hPa");
   console.log("Visibility: " + weather.visibility / 1000 + "km");
 };
+
+let displayDOM = () => {
+  //CITY, COUNTRY
+  const city = document.querySelector('.city');
+  city.textContent = weather.city;
+  const country = document.querySelector('.country');
+  country.textContent = weather.country;
+  //DATE
+  const date = document.querySelector('.date');
+  let dateFormat = formatDate(weather.currentDate);
+  date.textContent = dateFormat;
+  //ICON
+  const icon = document.querySelector('.icon');
+  icon.src = url_icon;
+  //TEMPERATURE
+  const temp = document.querySelector('.temperature');
+  temp.textContent = weather.temp_celsius + "°C";
+  const temp_feelsLike = document.querySelector('.feels');
+  temp_feelsLike.textContent = weather.tempFeelsLike_celsius + "°C";
+  //DESCRIPTION
+  const desc = document.querySelector('.description');
+  desc.textContent = weather.weather_desc;
+  //WIND SPEED
+  const windSpeed = document.querySelector('.wind_speed');
+  windSpeed.textContent = weather.windSpeed + "m/s " + degToCompass(weather.windDirection);
+  //HUMIDITY
+  const humidity = document.querySelector('.humidity');
+  humidity.textContent = weather.humidity + "%";
+  //DEW POINT
+  const duePoint = document.querySelector('.dew_point');
+  duePoint.textContent = calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
+  //PRESSURE
+  const pressure = document.querySelector('.pressure');
+  pressure.textContent = weather.pressure + "hPa";
+  //VISIBILITY
+  const visibility = document.querySelector('.visibility');
+  visibility.textContent = weather.visibility / 1000 + "km";
+}
 
 /*Calculate due point from temperature and relative humidity*/
 let calcDuePoint = (temp, humi) => {
@@ -115,6 +152,8 @@ let getAPI = async () => {
   weather.weather_desc = capitalizeFirstLetter(data.weather[0].description);
   /*WEATHER ICON*/
   weather.weather_icon = data.weather[0].icon;
+  url_icon =
+  "https://openweathermap.org/img/wn/" + weather.weather_icon + "@2x.png";
   /*WIND*/
   weather.windSpeed = data.wind.speed;
   weather.windDirection = data.wind.deg;
@@ -126,6 +165,7 @@ let getAPI = async () => {
   weather.visibility = data.visibility;
 
   displayWeatherData();
+  displayDOM();
 };
 
 /*Convert timzone from API to local time zone*/
@@ -164,3 +204,54 @@ let capitalizeFirstLetter = (string) => {
 
 /*MAIN API CALL*/
 getAPI();
+
+//SEARCHBAR
+const searchbar = document.querySelector('#searchbar');
+const errorMessage = document.querySelector('.error');
+
+searchbar.addEventListener('keypress', (e) => {
+  if (searchbar.value !== '' && e.keyCode === 13) {
+    console.log('Search weather of: ' + searchbar.value);
+    errorMessage.textContent = '';
+
+  inputLocation = searchbar.value;
+
+  url =
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
+    inputLocation +
+    "&appid=" +
+    api_key.weather;
+
+    getAPI().catch((error) => {
+      console.log(error);
+      errorMessage.textContent = 'city not found, please try again.. :('
+    });
+  }
+});
+
+//TOGGLE
+const toggle = document.querySelector('input[type=checkbox]');
+
+toggle.addEventListener('change', (e) => {
+  if (!e.target.checked) { //celsius
+    //TEMPERATURE
+    const temp = document.querySelector('.temperature');
+    temp.textContent = weather.temp_celsius + "°C";
+    const temp_feelsLike = document.querySelector('.feels');
+    temp_feelsLike.textContent = weather.tempFeelsLike_celsius + "°C";
+    //DEW POINT
+    const duePoint = document.querySelector('.dew_point');
+    duePoint.textContent = calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
+  } else {  //fahrenheit
+    //TEMPERATURE
+    const temp = document.querySelector('.temperature');
+    temp.textContent = weather.temp_fahrenheit + "°F";
+    const temp_feelsLike = document.querySelector('.feels');
+    temp_feelsLike.textContent = weather.tempFeelsLike_fahrenheit + "°F";
+    //DEW POINT
+    const duePoint = document.querySelector('.dew_point');
+    duePoint.textContent = calcDuePoint(weather.temp_fahrenheit, weather.humidity) + "°F";
+  }
+})
+
+
