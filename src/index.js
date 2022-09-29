@@ -220,7 +220,7 @@ let convertTime = (apiTimezone) => {
 
 /*Format date to make it nicer to read*/
 let formatDate = (date) => {
-  let result = format(new Date(date), "MMM dd, hh:maaa");
+  let result = format(new Date(date), "MMM dd, hh:mmaaa");
   return result;
 };
 
