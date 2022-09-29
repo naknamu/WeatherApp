@@ -126,8 +126,37 @@ let degToCompass = (num) => {
   return arr[val % 16];
 };
 
+//LOADERS
+let loaderFactory = (() => {
+  const loader = document.createElement('span');
+  const weather = document.querySelector('.weather');
+  const container = document.querySelector('.container');
+
+  loader.classList.add('loader');
+
+  let enable = () => {
+    console.log('LOADER ON!');
+      container.insertBefore(loader, weather);
+      weather.style.display = 'none';
+  }
+  
+  let disable = () => {
+      const createdLoaders = document.querySelectorAll('.loader'); //remove multiple loaders created
+      createdLoaders.forEach(loader => {
+        container.removeChild(loader);
+      });
+      weather.style.display = 'flex';
+  }
+
+  return{enable, disable};
+});
+
 /*Fetch API DATA from openweathermap.org*/
 let getAPI = async () => {
+  //ENABLE LOADER
+  const loaderObject = loaderFactory();
+  loaderObject.enable();
+
   const response = await fetch(url, { mode: "cors" });
   const data = await response.json();
 
@@ -166,6 +195,9 @@ let getAPI = async () => {
 
   displayWeatherData();
   displayDOM();
+
+  //DISABLE LOADER
+  loaderObject.disable();
 };
 
 /*Convert timzone from API to local time zone*/
@@ -203,6 +235,7 @@ let capitalizeFirstLetter = (string) => {
 };
 
 /*MAIN API CALL*/
+
 getAPI();
 
 //SEARCHBAR
@@ -224,7 +257,7 @@ searchbar.addEventListener('keypress', (e) => {
 
     getAPI().catch((error) => {
       console.log(error);
-      errorMessage.textContent = 'city not found, please try again.. :('
+      errorMessage.textContent = 'city not found, please try again.. :(';
     });
   }
 });
@@ -253,5 +286,10 @@ toggle.addEventListener('change', (e) => {
     duePoint.textContent = calcDuePoint(weather.temp_fahrenheit, weather.humidity) + "°F";
   }
 })
+
+
+
+
+
 
 
