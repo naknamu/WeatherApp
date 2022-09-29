@@ -55,41 +55,43 @@ const displayWeatherData = () => {
 
 let displayDOM = () => {
   //CITY, COUNTRY
-  const city = document.querySelector('.city');
+  const city = document.querySelector(".city");
   city.textContent = weather.city;
-  const country = document.querySelector('.country');
+  const country = document.querySelector(".country");
   country.textContent = weather.country;
   //DATE
-  const date = document.querySelector('.date');
+  const date = document.querySelector(".date");
   let dateFormat = formatDate(weather.currentDate);
   date.textContent = dateFormat;
   //ICON
-  const icon = document.querySelector('.icon');
+  const icon = document.querySelector(".icon");
   icon.src = url_icon;
   //TEMPERATURE
-  const temp = document.querySelector('.temperature');
+  const temp = document.querySelector(".temperature");
   temp.textContent = weather.temp_celsius + "°C";
-  const temp_feelsLike = document.querySelector('.feels');
+  const temp_feelsLike = document.querySelector(".feels");
   temp_feelsLike.textContent = weather.tempFeelsLike_celsius + "°C";
   //DESCRIPTION
-  const desc = document.querySelector('.description');
+  const desc = document.querySelector(".description");
   desc.textContent = weather.weather_desc;
   //WIND SPEED
-  const windSpeed = document.querySelector('.wind_speed');
-  windSpeed.textContent = weather.windSpeed + "m/s " + degToCompass(weather.windDirection);
+  const windSpeed = document.querySelector(".wind_speed");
+  windSpeed.textContent =
+    weather.windSpeed + "m/s " + degToCompass(weather.windDirection);
   //HUMIDITY
-  const humidity = document.querySelector('.humidity');
+  const humidity = document.querySelector(".humidity");
   humidity.textContent = weather.humidity + "%";
   //DEW POINT
-  const duePoint = document.querySelector('.dew_point');
-  duePoint.textContent = calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
+  const duePoint = document.querySelector(".dew_point");
+  duePoint.textContent =
+    calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
   //PRESSURE
-  const pressure = document.querySelector('.pressure');
+  const pressure = document.querySelector(".pressure");
   pressure.textContent = weather.pressure + "hPa";
   //VISIBILITY
-  const visibility = document.querySelector('.visibility');
+  const visibility = document.querySelector(".visibility");
   visibility.textContent = weather.visibility / 1000 + "km";
-}
+};
 
 /*Calculate due point from temperature and relative humidity*/
 let calcDuePoint = (temp, humi) => {
@@ -127,29 +129,34 @@ let degToCompass = (num) => {
 };
 
 //LOADERS
-let loaderFactory = (() => {
-  const loader = document.createElement('span');
-  const weather = document.querySelector('.weather');
-  const container = document.querySelector('.container');
+let loaderFactory = () => {
+  const loader = document.createElement("span");
+  const weather = document.querySelector(".weather");
+  const container = document.querySelector(".container");
 
-  loader.classList.add('loader');
+  loader.classList.add("loader");
 
   let enable = () => {
-    console.log('LOADER ON!');
+    console.log("LOADER ON!");
+    //is loader already loading?
+    //to avoid double loader loading
+    const isLoading = document.querySelectorAll(".loader");
+    if (isLoading.length === 0) {
       container.insertBefore(loader, weather);
-      weather.style.display = 'none';
-  }
-  
-  let disable = () => {
-      const createdLoaders = document.querySelectorAll('.loader'); //remove multiple loaders created
-      createdLoaders.forEach(loader => {
-        container.removeChild(loader);
-      });
-      weather.style.display = 'flex';
-  }
+      weather.style.display = "none";
+    }
+  };
 
-  return{enable, disable};
-});
+  let disable = () => {
+    const createdLoaders = document.querySelectorAll(".loader"); //remove multiple loaders created
+    createdLoaders.forEach((loader) => {
+      container.removeChild(loader);
+    });
+    weather.style.display = "flex";
+  };
+
+  return { enable, disable };
+};
 
 /*Fetch API DATA from openweathermap.org*/
 let getAPI = async () => {
@@ -160,7 +167,7 @@ let getAPI = async () => {
   const response = await fetch(url, { mode: "cors" });
   const data = await response.json();
 
-  console.log(data);
+  // console.log(data);
   /*LOCATION*/
   weather.city = data.name;
   weather.country = data.sys.country;
@@ -182,7 +189,7 @@ let getAPI = async () => {
   /*WEATHER ICON*/
   weather.weather_icon = data.weather[0].icon;
   url_icon =
-  "https://openweathermap.org/img/wn/" + weather.weather_icon + "@2x.png";
+    "https://openweathermap.org/img/wn/" + weather.weather_icon + "@2x.png";
   /*WIND*/
   weather.windSpeed = data.wind.speed;
   weather.windDirection = data.wind.deg;
@@ -193,7 +200,7 @@ let getAPI = async () => {
   /*VISIBILITY*/
   weather.visibility = data.visibility;
 
-  displayWeatherData();
+  // displayWeatherData();
   displayDOM();
 
   //DISABLE LOADER
@@ -239,57 +246,54 @@ let capitalizeFirstLetter = (string) => {
 getAPI();
 
 //SEARCHBAR
-const searchbar = document.querySelector('#searchbar');
-const errorMessage = document.querySelector('.error');
+const searchbar = document.querySelector("#searchbar");
+const errorMessage = document.querySelector(".error");
 
-searchbar.addEventListener('keypress', (e) => {
-  if (searchbar.value !== '' && e.keyCode === 13) {
-    console.log('Search weather of: ' + searchbar.value);
-    errorMessage.textContent = '';
+searchbar.addEventListener("keypress", (e) => {
+  if (searchbar.value !== "" && e.keyCode === 13) {
+    console.log("Search weather of: " + searchbar.value);
+    errorMessage.textContent = "";
 
-  inputLocation = searchbar.value;
+    inputLocation = searchbar.value;
 
-  url =
-    "https://api.openweathermap.org/data/2.5/weather?q=" +
-    inputLocation +
-    "&appid=" +
-    api_key.weather;
+    url =
+      "https://api.openweathermap.org/data/2.5/weather?q=" +
+      inputLocation +
+      "&appid=" +
+      api_key.weather;
 
     getAPI().catch((error) => {
       console.log(error);
-      errorMessage.textContent = 'city not found, please try again.. :(';
+      errorMessage.textContent = "city not found, please try again.. :(";
     });
   }
 });
 
 //TOGGLE
-const toggle = document.querySelector('input[type=checkbox]');
+const toggle = document.querySelector("input[type=checkbox]");
 
-toggle.addEventListener('change', (e) => {
-  if (!e.target.checked) { //celsius
+toggle.addEventListener("change", (e) => {
+  if (!e.target.checked) {
+    //celsius
     //TEMPERATURE
-    const temp = document.querySelector('.temperature');
+    const temp = document.querySelector(".temperature");
     temp.textContent = weather.temp_celsius + "°C";
-    const temp_feelsLike = document.querySelector('.feels');
+    const temp_feelsLike = document.querySelector(".feels");
     temp_feelsLike.textContent = weather.tempFeelsLike_celsius + "°C";
     //DEW POINT
-    const duePoint = document.querySelector('.dew_point');
-    duePoint.textContent = calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
-  } else {  //fahrenheit
+    const duePoint = document.querySelector(".dew_point");
+    duePoint.textContent =
+      calcDuePoint(weather.temp_celsius, weather.humidity) + "°C";
+  } else {
+    //fahrenheit
     //TEMPERATURE
-    const temp = document.querySelector('.temperature');
+    const temp = document.querySelector(".temperature");
     temp.textContent = weather.temp_fahrenheit + "°F";
-    const temp_feelsLike = document.querySelector('.feels');
+    const temp_feelsLike = document.querySelector(".feels");
     temp_feelsLike.textContent = weather.tempFeelsLike_fahrenheit + "°F";
     //DEW POINT
-    const duePoint = document.querySelector('.dew_point');
-    duePoint.textContent = calcDuePoint(weather.temp_fahrenheit, weather.humidity) + "°F";
+    const duePoint = document.querySelector(".dew_point");
+    duePoint.textContent =
+      calcDuePoint(weather.temp_fahrenheit, weather.humidity) + "°F";
   }
-})
-
-
-
-
-
-
-
+});
